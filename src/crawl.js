@@ -19,9 +19,34 @@ function normalizeURL(url){
 }
 
 function getURLsFromHTML(htmlStr, baseURL){
+  const result = []
   const dom = new JSDOM(htmlStr);
-  const arrURLs = dom.window.document.querySelectorAll('a');
+  // Get the anchor elemnts
+  const arrAnchors = dom.window.document.querySelectorAll('a');
 
+  if (arrAnchors.length == 0) {
+    return result;
+  }
+
+  // Extract the URLs from the anchors
+  let arrRefs = []
+  for(let i = 0; i < arrAnchors.length; i++){
+    arrRefs.push(String(arrAnchors[i].href))
+  }
+
+  for(let i = 0; i < arrRefs.length; i++){
+    let currRef = arrRefs[i];
+    let refChars = currRef.split("");
+
+    if(refChars[0] == "/" && refChars[1] == "/"){
+      result.push(`http:${currRef}`);
+    } else if(!currRef.includes(baseURL) && !currRef.includes("http://")){
+      result.push(`${baseURL}${currRef}`);
+    } else {
+      result.push(currRef);
+    }
+  }
+  return result;
 }
 
 module.exports = { 

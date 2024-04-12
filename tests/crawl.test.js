@@ -32,13 +32,22 @@ test("ignore port", () => {
 // Tests for getURLsFromHTML()
 const baseURL = 'https://example.com'
 
+test("add absolute URL", () => {
+  expect(
+    getURLsFromHTML(
+      '<a href="https://example.com/absolute/path/">Absolute</a>',
+      baseURL,
+    ),
+  ).toStrictEqual(["https://example.com/absolute/path/"]);
+});
+
 test("convert relative URL to absolute", () => {
   expect(
     getURLsFromHTML(
       '<a href="/relative/path/">Relative</a>',
       baseURL,
     ),
-  ).toBe(["http://example.com/relative/path/"]);
+  ).toStrictEqual(["https://example.com/relative/path/"]);
 });
 
 test("return array of URL strings", () => {
@@ -47,7 +56,7 @@ test("return array of URL strings", () => {
       '<a href="http://external.com">External</a><a href="/internal/">Internal</a>',
       baseURL,
     ),
-  ).toBe(["http://external.com", "http://example.com/internal/"]);
+  ).toStrictEqual(["http://external.com/", "https://example.com/internal/"]);
 });
 
 test("should handle protocol-relative URLs", () => {
@@ -56,7 +65,7 @@ test("should handle protocol-relative URLs", () => {
       '<a href="//protocol-relative.com">Protocol Relative</a>',
       baseURL,
     ),
-  ).toBe(["http://protocol-relative.com"]);
+  ).toStrictEqual(["http://protocol-relative.com"]);
 });
 
 test("should ignore HTML string without URLs", () => {
@@ -65,5 +74,5 @@ test("should ignore HTML string without URLs", () => {
       '<div>Sample text</div>',
       baseURL,
     ),
-  ).toBe([]);
+  ).toStrictEqual([]);
 });
