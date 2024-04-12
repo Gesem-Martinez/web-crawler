@@ -14,7 +14,6 @@ function normalizeURL(url){
     result = newStr;
   }
 
-
   return result;
 }
 
@@ -49,28 +48,54 @@ function getURLsFromHTML(htmlStr, baseURL){
   return result;
 }
 
-async function crawlPage(pageRoot){
+async function crawlPage(rootURL, currentURL, pages){
+  const rootURLObj = new URL(rootURL);
+  const currURLObj = new URL(currentURL);
+
+  if(currURLObj.hostname !== rootURLObj.hostname){
+    return pages;
+  }
+
+  let normalizedCurrURL = normalizeURL(currentURL);
+
+  if (pages[normalizedCurrURL] > 0){
+    pages[normalizedCurrURL] += 1;
+    return pages;
+  } else {
+    pages[normalizedCurrURL] = 1;
+  }
+  
+  // Fetch page contents
+  let htmlStr = "";
   try{
 
-    let response = await fetch(pageRoot);
+    let response = await fetch(currentURL);
 
     if(response.status >= 400){
       console.log("Error fetching the page");
-      return;
+      return pages;
     }
 
     if(!response.headers.get("Content-Type").includes("text/html")){
       console.log(response.headers.get("Content-Type"));
       console.log("Error: Content type not text/html");
-      return;
+      return pages;
     }
 
-    console.log("Exito");
-    console.log(await response.text());
+    htmlStr = await response.text();
+    console.log("Exito " + currentURL);
 
   } catch (err) {
     console.log(err.message);
   }
+
+  let pageURLs = getURLsFromHTML(htmlStr, rootURL);
+
+  for (const urlItem of pageURLs){
+    pages = await crawlPage(rootURL, urlItem, pages);
+  }
+
+  return pages;
 }
 
 module.exports = { 
