@@ -49,7 +49,32 @@ function getURLsFromHTML(htmlStr, baseURL){
   return result;
 }
 
+async function crawlPage(pageRoot){
+  try{
+
+    let response = await fetch(pageRoot);
+
+    if(response.status >= 400){
+      console.log("Error fetching the page");
+      return;
+    }
+
+    if(!response.headers.get("Content-Type").includes("text/html")){
+      console.log(response.headers.get("Content-Type"));
+      console.log("Error: Content type not text/html");
+      return;
+    }
+
+    console.log("Exito");
+    console.log(await response.text());
+
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+
 module.exports = { 
   normalizeURL,
-  getURLsFromHTML
+  getURLsFromHTML,
+  crawlPage
 };
