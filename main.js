@@ -1,5 +1,6 @@
 const { argv } = require("node:process");
 const { crawlPage } = require("./src/crawl");
+const { printReport } = require("./src/report");
 
 
 async function main(){
@@ -14,10 +15,8 @@ async function main(){
     console.log(`Initiating crawler at ${baseURL}`);
 
     const result = await crawlPage(baseURL, currURL, pages);
-    console.log("RESULTADO:");
-    for(let key in result){
-      console.log(`${key}: ${result[key]}`);
-    }
+    console.log("\n=============== RESULTS ===============");
+    printReport(result);
   }
 
 }
